@@ -1,9 +1,5 @@
+use crate::element::Element;
 use serde_derive::Deserialize;
-
-#[derive(Clone, PartialEq, Debug)]
-enum Element {
-    Resource(String),
-}
 
 #[derive(Deserialize, PartialEq, Debug)]
 pub struct Transformation {
@@ -12,7 +8,7 @@ pub struct Transformation {
 }
 
 impl Transformation {
-    fn apply(self, e: &Element) -> Element {
+    pub fn apply(&self, e: &Element) -> Element {
         match e {
             Element::Resource(r) => Element::Resource(r.replace(&self.matcher, &self.replacement)),
         }
