@@ -1,4 +1,5 @@
 use crate::element::Element;
+use crate::state::State;
 use crate::transformation::Transformation;
 use anyhow::Result;
 use serde_derive::Deserialize;
@@ -9,11 +10,6 @@ struct Migration {
     name: String,
     description: String,
     transformations: Vec<Transformation>,
-}
-
-#[derive(PartialEq, Debug)]
-struct State {
-    elements: Vec<Element>,
 }
 
 impl Migration {
