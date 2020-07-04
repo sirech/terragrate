@@ -1,0 +1,3 @@
+docker_container.container
+docker_image.image
+public_network.docker_network.network
