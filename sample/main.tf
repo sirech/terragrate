@@ -6,8 +6,9 @@ resource "docker_image" "image" {
   name = "nginx:alpine"
 }
 
-resource "docker_network" "network" {
-  name = "my_network"
+module "public_network" {
+  source = "./network"
+  name   = "my_network"
 }
 
 resource "docker_container" "container" {
@@ -27,6 +28,6 @@ resource "docker_container" "container" {
   shm_size        = 64
 
   networks_advanced {
-    name = docker_network.network.name
+    name = module.public_network.name
   }
 }
