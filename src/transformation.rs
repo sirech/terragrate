@@ -1,11 +1,14 @@
+use serde_derive::Deserialize;
+
 #[derive(Clone, PartialEq, Debug)]
 enum Element {
     Resource(String),
 }
 
-struct Transformation {
-    matcher: String,
-    replacement: String,
+#[derive(Deserialize, PartialEq, Debug)]
+pub struct Transformation {
+    pub matcher: String,
+    pub replacement: String,
 }
 
 impl Transformation {

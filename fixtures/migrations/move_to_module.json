@@ -1,0 +1,10 @@
+{
+  "name": "move to module",
+  "description": "Convert network to module",
+  "transformations": [
+    {
+      "matcher": "public_network",
+      "replacement": "module.public_network"
+    }
+  ]
+}
