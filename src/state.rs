@@ -8,7 +8,7 @@ pub struct State {
 }
 
 impl State {
-    fn from_file(file_name: &str) -> Result<State> {
+    pub fn from_file(file_name: &str) -> Result<State> {
         let content = fs::read_to_string(file_name)?;
 
         Ok(State {

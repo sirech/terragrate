@@ -6,20 +6,20 @@ use serde_derive::Deserialize;
 use std::fs;
 
 #[derive(Deserialize, PartialEq, Debug)]
-struct Migration {
+pub struct Migration {
     name: String,
     description: String,
     transformations: Vec<Transformation>,
 }
 
 impl Migration {
-    fn from_file(file_name: &str) -> Result<Self> {
+    pub fn from_file(file_name: &str) -> Result<Self> {
         let content = fs::read_to_string(file_name)?;
         let result = serde_json::from_str(&content)?;
         Ok(result)
     }
 
-    fn apply(&self, state: &State) -> State {
+    pub fn apply(&self, state: &State) -> State {
         let new_elements = state
             .elements
             .iter()

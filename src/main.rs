@@ -1,8 +1,12 @@
 #[macro_use]
 extern crate clap;
 
+use anyhow::Result;
 use serde_derive::Deserialize;
 use std::fs;
+
+use terragrate::migration::Migration;
+use terragrate::state::State;
 
 #[derive(Deserialize)]
 struct Config {
@@ -21,12 +25,20 @@ fn config() -> Config {
     toml::from_str(&content).unwrap()
 }
 
-fn main() {
+fn main() -> Result<()> {
     let cfg = config();
     let matches = clap_app!(terragrate =>
                             (version: &*cfg.package.version)
                             (author: &*cfg.package.authors.join(","))
                             (about: &*cfg.package.description)
+                            (@arg STATE: -s --state <state> +takes_value "State file")
+                            (@arg MIGRATION: -m --migration <migration> +takes_value "Migration file")
     )
     .get_matches();
+
+    let state = State::from_file(matches.value_of("STATE").expect("unreachable"))?;
+    let migration = Migration::from_file(matches.value_of("MIGRATION").expect("unreachable"))?;
+
+    println!("Migration result: {:?}", migration.apply(&state));
+    Ok(())
 }
