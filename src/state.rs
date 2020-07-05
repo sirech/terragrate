@@ -1,6 +1,7 @@
 use crate::element::Element;
 use anyhow::Result;
 use std::fs;
+use std::io::{self, Read};
 
 #[derive(PartialEq, Debug)]
 pub struct State {
@@ -8,15 +9,25 @@ pub struct State {
 }
 
 impl State {
-    pub fn from_file(file_name: &str) -> Result<State> {
+    pub fn from_file(file_name: &str) -> Result<Self> {
         let content = fs::read_to_string(file_name)?;
+        Ok(State::new(&content))
+    }
 
-        Ok(State {
+    // TODO: cover in test
+    pub fn from_stdin() -> Result<Self> {
+        let mut buffer = String::new();
+        io::stdin().lock().read_to_string(&mut buffer)?;
+        Ok(State::new(&buffer))
+    }
+
+    fn new(content: &str) -> Self {
+        Self {
             elements: content
                 .lines()
                 .map(|l| Element::Resource(l.to_string()))
                 .collect(),
-        })
+        }
     }
 }
 
