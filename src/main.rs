@@ -31,6 +31,8 @@ fn main() -> Result<()> {
                             (version: &*cfg.package.version)
                             (author: &*cfg.package.authors.join(","))
                             (about: &*cfg.package.description)
+                            (@setting ArgRequiredElseHelp)
+                            (@setting ColoredHelp)
                             (@arg STATE: -s --state <state> +takes_value "State file")
                             (@arg MIGRATION: -m --migration <migration> +takes_value "Migration file")
     )
