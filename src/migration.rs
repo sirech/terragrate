@@ -1,6 +1,6 @@
 use crate::element::Element;
 use crate::state::State;
-use crate::transformation::Transformation;
+use crate::transformation::{Transformation, TransformationType};
 use anyhow::Result;
 use serde_derive::Deserialize;
 use std::fs;
@@ -57,6 +57,7 @@ mod migration_tests {
             name: "move to module".to_string(),
             description: "Convert network to module".to_string(),
             transformations: vec![Transformation {
+                kind: TransformationType::MV,
                 matcher: "public_network".to_string(),
                 replacement: "module.public_network".to_string(),
             }],

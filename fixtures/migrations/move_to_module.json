@@ -3,6 +3,7 @@
   "description": "Convert network to module",
   "transformations": [
     {
+      "kind": "MV",
       "matcher": "public_network",
       "replacement": "module.public_network"
     }
