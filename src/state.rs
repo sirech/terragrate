@@ -29,6 +29,14 @@ impl State {
                 .collect(),
         }
     }
+
+    pub fn diff(&self, other: &State) -> Vec<String> {
+        self.elements
+            .iter()
+            .zip(other.elements.iter())
+            .map(|(src, dst)| src.diff(&dst))
+            .collect()
+    }
 }
 
 #[cfg(test)]

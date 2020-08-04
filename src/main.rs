@@ -49,6 +49,13 @@ fn main() -> Result<()> {
     let state = read_state(matches.value_of("STATE").expect("unreachable"))?;
     let migration = Migration::from_file(matches.value_of("MIGRATION").expect("unreachable"))?;
 
-    println!("Migration result: {:?}", migration.apply(&state));
+    let result = migration.apply(&state);
+
+    let diff = state.diff(&result);
+    println!("Resulting state is:");
+    for line in diff.iter() {
+        println!("{}", line);
+    }
+
     Ok(())
 }
