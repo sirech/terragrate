@@ -32,9 +32,14 @@ fn read_state(file: &str) -> Result<State> {
     }
 }
 
+fn print_state(state: &State) {
+    for line in state.elements.iter() {
+        println!("{}", line)
+    }
+}
+
 fn print_diff(state: &State, result: &State) {
     let diff = state.diff(&result);
-    println!("Resulting state is:");
     for line in diff.iter() {
         println!("{}", line);
     }
@@ -50,6 +55,12 @@ fn main() -> Result<()> {
                             (@setting ColoredHelp)
                             (@arg STATE: -s --state <STATE_FILE> +takes_value "State file to migrate")
                             (@arg MIGRATION: -m --migration <MIGRATION_FILE> +takes_value "Migration file to use for the migration")
+                            (@subcommand initial_state =>
+                             (about: "Prints the initial state")
+                            )
+                            (@subcommand end_state =>
+                             (about: "Prints the end state after the migration")
+                            )
                             (@subcommand diff =>
                              (about: "Show the difference between the existing state and the end state")
                             )
@@ -59,8 +70,15 @@ fn main() -> Result<()> {
 
     let state = read_state(matches.value_of("STATE").expect("unreachable"))?;
     let migration = Migration::from_file(matches.value_of("MIGRATION").expect("unreachable"))?;
-
     let result = migration.apply(&state);
+
+    if matches.subcommand_matches("initial_state").is_some() {
+        print_state(&state);
+    }
+
+    if matches.subcommand_matches("end_state").is_some() {
+        print_state(&result);
+    }
 
     if matches.subcommand_matches("diff").is_some() {
         print_diff(&state, &result);
