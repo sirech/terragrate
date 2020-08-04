@@ -2,28 +2,10 @@
 extern crate clap;
 
 use anyhow::Result;
-use serde_derive::Deserialize;
-use std::fs;
 
+use terragrate::config;
 use terragrate::migration::Migration;
 use terragrate::state::State;
-
-#[derive(Deserialize)]
-struct Config {
-    package: Package,
-}
-
-#[derive(Deserialize, Debug)]
-struct Package {
-    authors: Vec<String>,
-    version: String,
-    description: String,
-}
-
-fn config() -> Config {
-    let content = fs::read_to_string("Cargo.toml").unwrap();
-    toml::from_str(&content).unwrap()
-}
 
 fn read_state(file: &str) -> Result<State> {
     match file {
@@ -46,7 +28,7 @@ fn print_diff(state: &State, result: &State) {
 }
 
 fn main() -> Result<()> {
-    let cfg = config();
+    let cfg = config::config();
     let matches = clap_app!(terragrate =>
                             (version: &*cfg.package.version)
                             (author: &*cfg.package.authors.join(","))
