@@ -32,6 +32,14 @@ fn read_state(file: &str) -> Result<State> {
     }
 }
 
+fn print_diff(state: &State, result: &State) {
+    let diff = state.diff(&result);
+    println!("Resulting state is:");
+    for line in diff.iter() {
+        println!("{}", line);
+    }
+}
+
 fn main() -> Result<()> {
     let cfg = config();
     let matches = clap_app!(terragrate =>
@@ -42,6 +50,9 @@ fn main() -> Result<()> {
                             (@setting ColoredHelp)
                             (@arg STATE: -s --state <STATE_FILE> +takes_value "State file to migrate")
                             (@arg MIGRATION: -m --migration <MIGRATION_FILE> +takes_value "Migration file to use for the migration")
+                            (@subcommand diff =>
+                             (about: "Show the difference between the existing state and the end state")
+                            )
                             (after_help: "When STATE_FILE is '-', read standard input.")
     )
     .get_matches();
@@ -51,10 +62,8 @@ fn main() -> Result<()> {
 
     let result = migration.apply(&state);
 
-    let diff = state.diff(&result);
-    println!("Resulting state is:");
-    for line in diff.iter() {
-        println!("{}", line);
+    if matches.subcommand_matches("diff").is_some() {
+        print_diff(&state, &result);
     }
 
     Ok(())
