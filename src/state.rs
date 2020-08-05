@@ -60,4 +60,15 @@ mod state_tests {
             current()
         )
     }
+
+    #[test]
+    fn test_diff_compares_state_line_by_line() {
+        let lines: Vec<String> = current().elements.iter().map(|l| l.to_string()).collect();
+        assert_eq!(
+            State::from_file("fixtures/state/current")
+                .unwrap()
+                .diff(&current()),
+            lines
+        )
+    }
 }
