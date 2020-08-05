@@ -69,103 +69,91 @@ impl Transformation {
 mod transform_tests {
     use super::*;
 
+    fn element() -> Element {
+        Element::Resource("module.public_network.docker_network.network".to_string())
+    }
+
+    fn mv() -> Transformation {
+        Transformation {
+            kind: TransformationType::MV,
+            matcher: "public_network".to_string(),
+            replacement: "private_network".to_string(),
+        }
+    }
+
+    fn rm(matcher: &str) -> Transformation {
+        Transformation {
+            kind: TransformationType::RM,
+            matcher: matcher.to_string(),
+            replacement: "".to_string(),
+        }
+    }
+
     #[test]
     fn test_mv_apply_leaves_element_unchanged_if_it_doesnt_apply() {
-        let e = Element::Resource("module.public_network.docker_network.network".to_string());
         let t = Transformation {
             kind: TransformationType::MV,
             matcher: "private_network".to_string(),
             replacement: "error".to_string(),
         };
-        assert_eq!(e, t.apply(&e).element)
+        assert_eq!(element(), t.apply(&element()).element)
     }
 
     #[test]
     fn test_mv_apply_empty_command_if_it_doesnt_apply() {
-        let e = Element::Resource("module.public_network.docker_network.network".to_string());
         let t = Transformation {
             kind: TransformationType::MV,
             matcher: "private_network".to_string(),
             replacement: "error".to_string(),
         };
-        assert_eq!(Command::NoOp, t.apply(&e).command)
+        assert_eq!(Command::NoOp, t.apply(&element()).command)
     }
 
     #[test]
     fn test_mv_apply_changes_element() {
-        let e = Element::Resource("module.public_network.docker_network.network".to_string());
-        let t = Transformation {
-            kind: TransformationType::MV,
-            matcher: "public_network".to_string(),
-            replacement: "private_network".to_string(),
-        };
         assert_eq!(
             Element::Resource("module.private_network.docker_network.network".to_string()),
-            t.apply(&e).element
+            mv().apply(&element()).element
         )
     }
 
     #[test]
     fn test_mv_apply_creates_mv_command() {
-        let e = Element::Resource("module.public_network.docker_network.network".to_string());
-        let t = Transformation {
-            kind: TransformationType::MV,
-            matcher: "public_network".to_string(),
-            replacement: "private_network".to_string(),
-        };
         assert_eq!(
             Command::MV {
-                source: e.to_string(),
+                source: element().to_string(),
                 target: "module.private_network.docker_network.network".to_string()
             },
-            t.apply(&e).command
+            mv().apply(&element()).command
         )
     }
 
     #[test]
     fn test_rm_apply_leaves_element_unchanged_if_it_doesnt_apply() {
-        let e = Element::Resource("module.public_network.docker_network.network".to_string());
-        let t = Transformation {
-            kind: TransformationType::RM,
-            matcher: "private_network".to_string(),
-            replacement: "".to_string(),
-        };
-        assert_eq!(e, t.apply(&e).element)
+        assert_eq!(element(), rm("private_network").apply(&element()).element)
     }
 
     #[test]
     fn test_rm_apply_empty_command_if_it_doesnt_apply() {
-        let e = Element::Resource("module.public_network.docker_network.network".to_string());
-        let t = Transformation {
-            kind: TransformationType::RM,
-            matcher: "private_network".to_string(),
-            replacement: "".to_string(),
-        };
-        assert_eq!(Command::NoOp, t.apply(&e).command)
+        assert_eq!(
+            Command::NoOp,
+            rm("private_network").apply(&element()).command
+        )
     }
 
     #[test]
     fn test_rm_apply_removes_element() {
-        let e = Element::Resource("module.public_network.docker_network.network".to_string());
-        let t = Transformation {
-            kind: TransformationType::RM,
-            matcher: "public_network".to_string(),
-            replacement: "".to_string(),
-        };
-        assert_eq!(Element::Empty, t.apply(&e).element)
+        assert_eq!(
+            Element::Empty,
+            rm("public_network").apply(&element()).element
+        )
     }
 
     #[test]
     fn test_rm_apply_creates_rm_command() {
-        let e = Element::Resource("module.public_network.docker_network.network".to_string());
-        let t = Transformation {
-            kind: TransformationType::RM,
-            matcher: "public_network".to_string(),
-            replacement: "".to_string(),
-        };
         assert_eq!(
             Command::RM("module.public_network.docker_network.network".to_string()),
-            t.apply(&e).command
+            rm("public_network").apply(&element()).command
         )
     }
 }
