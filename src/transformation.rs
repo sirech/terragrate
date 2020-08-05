@@ -50,15 +50,17 @@ impl Transformation {
     }
 
     fn rm(&self, e: &Element) -> TransformationResult {
-        let new_element = match e {
-            Element::Resource(r) if r.contains(&self.matcher) => Element::Empty,
-            Element::Resource(_) => e.clone(),
-            Element::Empty => Element::Empty,
+        let (new_element, command) = match e {
+            Element::Resource(r) if r.contains(&self.matcher) => {
+                (Element::Empty, Command::RM(r.to_string()))
+            }
+            Element::Resource(_) => (e.clone(), Command::NoOp),
+            Element::Empty => (Element::Empty, Command::NoOp),
         };
 
         TransformationResult {
             element: new_element,
-            command: Command::NoOp,
+            command: command,
         }
     }
 }
@@ -132,6 +134,17 @@ mod transform_tests {
     }
 
     #[test]
+    fn test_rm_apply_empty_command_if_it_doesnt_apply() {
+        let e = Element::Resource("module.public_network.docker_network.network".to_string());
+        let t = Transformation {
+            kind: TransformationType::RM,
+            matcher: "private_network".to_string(),
+            replacement: "".to_string(),
+        };
+        assert_eq!(Command::NoOp, t.apply(&e).command)
+    }
+
+    #[test]
     fn test_rm_apply_removes_element() {
         let e = Element::Resource("module.public_network.docker_network.network".to_string());
         let t = Transformation {
@@ -140,5 +153,19 @@ mod transform_tests {
             replacement: "".to_string(),
         };
         assert_eq!(Element::Empty, t.apply(&e).element)
+    }
+
+    #[test]
+    fn test_rm_apply_creates_rm_command() {
+        let e = Element::Resource("module.public_network.docker_network.network".to_string());
+        let t = Transformation {
+            kind: TransformationType::RM,
+            matcher: "public_network".to_string(),
+            replacement: "".to_string(),
+        };
+        assert_eq!(
+            Command::RM("module.public_network.docker_network.network".to_string()),
+            t.apply(&e).command
+        )
     }
 }
