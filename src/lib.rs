@@ -1,5 +1,6 @@
 pub mod config;
 
+mod command;
 mod element;
 pub mod migration;
 pub mod state;

@@ -1,3 +1,4 @@
+use crate::command::Command;
 use crate::element::Element;
 use serde_derive::Deserialize;
 
@@ -9,6 +10,7 @@ pub enum TransformationType {
 
 pub struct TransformationResult {
     pub element: Element,
+    pub command: Command,
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
@@ -32,8 +34,18 @@ impl Transformation {
             Element::Empty => Element::Empty,
         };
 
+        let command = match new_element {
+            Element::Resource(_) if *e == new_element => Command::NoOp,
+            Element::Resource(_) => Command::MV {
+                source: e.to_string(),
+                target: new_element.to_string(),
+            },
+            Element::Empty => Command::NoOp,
+        };
+
         TransformationResult {
             element: new_element,
+            command: command,
         }
     }
 
@@ -51,6 +63,7 @@ impl Transformation {
 
         TransformationResult {
             element: new_element,
+            command: Command::NoOp,
         }
     }
 }
@@ -71,6 +84,17 @@ mod transform_tests {
     }
 
     #[test]
+    fn test_mv_apply_empty_command_if_it_doesnt_apply() {
+        let e = Element::Resource("module.public_network.docker_network.network".to_string());
+        let t = Transformation {
+            kind: TransformationType::MV,
+            matcher: "private_network".to_string(),
+            replacement: "error".to_string(),
+        };
+        assert_eq!(Command::NoOp, t.apply(&e).command)
+    }
+
+    #[test]
     fn test_mv_apply_changes_element() {
         let e = Element::Resource("module.public_network.docker_network.network".to_string());
         let t = Transformation {
@@ -81,6 +105,23 @@ mod transform_tests {
         assert_eq!(
             Element::Resource("module.private_network.docker_network.network".to_string()),
             t.apply(&e).element
+        )
+    }
+
+    #[test]
+    fn test_mv_apply_creates_mv_command() {
+        let e = Element::Resource("module.public_network.docker_network.network".to_string());
+        let t = Transformation {
+            kind: TransformationType::MV,
+            matcher: "public_network".to_string(),
+            replacement: "private_network".to_string(),
+        };
+        assert_eq!(
+            Command::MV {
+                source: e.to_string(),
+                target: "module.private_network.docker_network.network".to_string()
+            },
+            t.apply(&e).command
         )
     }
 
