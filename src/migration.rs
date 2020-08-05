@@ -35,7 +35,7 @@ impl Migration {
     fn apply_element(&self, element: &Element) -> Element {
         self.transformations
             .iter()
-            .fold(element.clone(), |e, t| t.apply(&e))
+            .fold(element.clone(), |e, t| t.apply(&e).element)
     }
 }
 

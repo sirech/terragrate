@@ -7,6 +7,10 @@ pub enum TransformationType {
     RM,
 }
 
+pub struct TransformationResult {
+    pub element: Element,
+}
+
 #[derive(Deserialize, PartialEq, Debug)]
 pub struct Transformation {
     pub kind: TransformationType,
@@ -15,22 +19,26 @@ pub struct Transformation {
 }
 
 impl Transformation {
-    pub fn apply(&self, e: &Element) -> Element {
+    pub fn apply(&self, e: &Element) -> TransformationResult {
         match self.kind {
             TransformationType::MV => self.mv(e),
             TransformationType::RM => self.rm(e),
         }
     }
 
-    fn mv(&self, e: &Element) -> Element {
-        match e {
+    fn mv(&self, e: &Element) -> TransformationResult {
+        let new_element = match e {
             Element::Resource(r) => Element::Resource(r.replace(&self.matcher, &self.replacement)),
             Element::Empty => Element::Empty,
+        };
+
+        TransformationResult {
+            element: new_element,
         }
     }
 
-    fn rm(&self, e: &Element) -> Element {
-        match e {
+    fn rm(&self, e: &Element) -> TransformationResult {
+        let new_element = match e {
             Element::Resource(r) => {
                 if r.contains(&self.matcher) {
                     Element::Empty
@@ -39,6 +47,10 @@ impl Transformation {
                 }
             }
             Element::Empty => Element::Empty,
+        };
+
+        TransformationResult {
+            element: new_element,
         }
     }
 }
@@ -55,7 +67,7 @@ mod transform_tests {
             matcher: "private_network".to_string(),
             replacement: "error".to_string(),
         };
-        assert_eq!(e, t.apply(&e))
+        assert_eq!(e, t.apply(&e).element)
     }
 
     #[test]
@@ -68,7 +80,7 @@ mod transform_tests {
         };
         assert_eq!(
             Element::Resource("module.private_network.docker_network.network".to_string()),
-            t.apply(&e)
+            t.apply(&e).element
         )
     }
 
@@ -80,7 +92,7 @@ mod transform_tests {
             matcher: "private_network".to_string(),
             replacement: "".to_string(),
         };
-        assert_eq!(e, t.apply(&e))
+        assert_eq!(e, t.apply(&e).element)
     }
 
     #[test]
@@ -91,6 +103,6 @@ mod transform_tests {
             matcher: "public_network".to_string(),
             replacement: "".to_string(),
         };
-        assert_eq!(Element::Empty, t.apply(&e))
+        assert_eq!(Element::Empty, t.apply(&e).element)
     }
 }
