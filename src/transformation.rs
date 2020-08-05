@@ -51,13 +51,8 @@ impl Transformation {
 
     fn rm(&self, e: &Element) -> TransformationResult {
         let new_element = match e {
-            Element::Resource(r) => {
-                if r.contains(&self.matcher) {
-                    Element::Empty
-                } else {
-                    e.clone()
-                }
-            }
+            Element::Resource(r) if r.contains(&self.matcher) => Element::Empty,
+            Element::Resource(_) => e.clone(),
             Element::Empty => Element::Empty,
         };
 
