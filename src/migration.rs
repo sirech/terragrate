@@ -36,12 +36,7 @@ impl Migration {
             State {
                 elements: new_elements,
             },
-            Commands {
-                elements: commands
-                    .into_iter()
-                    .filter(|c| *c != Command::NoOp)
-                    .collect(),
-            },
+            Commands::new(commands),
         )
     }
 
