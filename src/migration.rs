@@ -1,3 +1,4 @@
+use crate::command::{Command, Commands};
 use crate::element::Element;
 use crate::state::State;
 
@@ -21,21 +22,40 @@ impl Migration {
         Ok(result)
     }
 
-    pub fn apply(&self, state: &State) -> State {
-        let new_elements = state
-            .elements
-            .iter()
-            .map(|e| self.apply_element(e))
-            .collect();
-        State {
-            elements: new_elements,
+    pub fn apply(&self, state: &State) -> (State, Commands) {
+        let mut new_elements = Vec::new();
+        let mut commands = Vec::new();
+
+        for element in state.elements.iter() {
+            let (new_element, mut new_commands) = self.apply_element(element);
+            new_elements.push(new_element);
+            commands.append(&mut new_commands);
         }
+
+        (
+            State {
+                elements: new_elements,
+            },
+            Commands {
+                elements: commands
+                    .into_iter()
+                    .filter(|c| *c != Command::NoOp)
+                    .collect(),
+            },
+        )
     }
 
-    fn apply_element(&self, element: &Element) -> Element {
-        self.transformations
-            .iter()
-            .fold(element.clone(), |e, t| t.apply(&e).element)
+    fn apply_element(&self, element: &Element) -> (Element, Vec<Command>) {
+        let mut acc = element.clone();
+        let mut commands = Vec::new();
+
+        for transformation in self.transformations.iter() {
+            let transformation_result = transformation.apply(&acc);
+            acc = transformation_result.element;
+            commands.push(transformation_result.command);
+        }
+
+        (acc, commands)
     }
 }
 
@@ -72,8 +92,8 @@ mod migration_tests {
     }
 
     #[test]
-    fn test_apply_simple_migration() {
-        let m = Migration::from_file("fixtures/migrations/move_to_module.json").unwrap();
+    fn test_apply_migration() {
+        let m = Migration::from_file("fixtures/migrations/multi_step.json").unwrap();
 
         let target = State {
             elements: vec![
@@ -83,6 +103,15 @@ mod migration_tests {
             ],
         };
 
-        assert_eq!(target, m.apply(&current()));
+        let expected_commands = Commands {
+            elements: vec![Command::MV {
+                source: "public_network.docker_network.network".to_string(),
+                target: "module.public_network.docker_network.network".to_string(),
+            }],
+        };
+
+        let (state, commands) = m.apply(&current());
+        assert_eq!(target, state);
+        assert_eq!(expected_commands, commands);
     }
 }

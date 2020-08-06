@@ -4,3 +4,8 @@ pub enum Command {
     RM(String),
     NoOp,
 }
+
+#[derive(PartialEq, Debug)]
+pub struct Commands {
+    pub elements: Vec<Command>,
+}

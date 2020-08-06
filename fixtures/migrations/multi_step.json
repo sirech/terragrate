@@ -1,0 +1,21 @@
+{
+  "name": "multiple steps",
+  "description": "Convert network to module, rm special network, move private network",
+  "transformations": [
+    {
+      "kind": "MV",
+      "matcher": "public_network",
+      "replacement": "module.public_network"
+    },
+    {
+      "kind": "RM",
+      "matcher": "special_network",
+      "replacement": ""
+    },
+    {
+      "kind": "MV",
+      "matcher": "private_network",
+      "replacement": "module.private_network"
+    }
+  ]
+}
