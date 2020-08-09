@@ -3,6 +3,7 @@ extern crate clap;
 
 use anyhow::Result;
 
+use terragrate::command::Commands;
 use terragrate::config;
 use terragrate::migration::Migration;
 use terragrate::state::State;
@@ -27,6 +28,12 @@ fn print_diff(state: &State, result: &State) {
     }
 }
 
+fn print_commands(result: &Commands) {
+    for line in result.elements.iter() {
+        println!("{}", line);
+    }
+}
+
 fn main() -> Result<()> {
     let cfg = config::config();
     let matches = clap_app!(terragrate =>
@@ -46,6 +53,9 @@ fn main() -> Result<()> {
                             (@subcommand diff =>
                              (about: "Show the difference between the existing state and the end state")
                             )
+                            (@subcommand tf =>
+                             (about: "Prints the terraform commands to execute the given migration")
+                            )
                             (after_help: "When STATE_FILE is '-', read standard input.")
     )
     .get_matches();
@@ -64,6 +74,10 @@ fn main() -> Result<()> {
 
     if matches.subcommand_matches("diff").is_some() {
         print_diff(&state, &result);
+    }
+
+    if matches.subcommand_matches("tf").is_some() {
+        print_commands(&commands);
     }
 
     Ok(())
