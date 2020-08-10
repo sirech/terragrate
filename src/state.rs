@@ -1,4 +1,5 @@
 use crate::element::Element;
+use crate::format_list::format_list;
 use anyhow::Result;
 use std::fmt;
 use std::fs;
@@ -11,15 +12,7 @@ pub struct State {
 
 impl fmt::Display for State {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let str = self
-            .elements
-            .iter()
-            .map(|c| c.to_string())
-            .filter(|s| s != "")
-            .collect::<Vec<String>>()
-            .join("\n");
-
-        write!(f, "{}", format!("{}", str))
+        write!(f, "{}", format!("{}", format_list(&self.elements)))
     }
 }
 

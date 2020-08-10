@@ -1,3 +1,4 @@
+use crate::format_list::format_list;
 use std::fmt;
 
 #[derive(PartialEq, Debug)]
@@ -25,14 +26,7 @@ pub struct Commands {
 
 impl fmt::Display for Commands {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let str = self
-            .elements
-            .iter()
-            .map(|c| c.to_string())
-            .collect::<Vec<String>>()
-            .join("\n");
-
-        write!(f, "{}", format!("{}", str))
+        write!(f, "{}", format!("{}", format_list(&self.elements)))
     }
 }
 
