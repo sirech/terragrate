@@ -1,0 +1,5 @@
+docker_container.private_container
+docker_container.public_container
+docker_image.image
+module.private_network.docker_network.network
+module.public_network.docker_network.network

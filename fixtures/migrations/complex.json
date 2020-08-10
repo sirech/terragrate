@@ -1,0 +1,26 @@
+{
+  "name": "complex",
+  "description": "More complex migration",
+  "transformations": [
+    {
+      "kind": "RM",
+      "matcher": "private_network",
+      "replacement": ""
+    },
+    {
+      "kind": "RM",
+      "matcher": "private_container",
+      "replacement": ""
+    },
+    {
+      "kind": "MV",
+      "matcher": "public_container",
+      "replacement": "container"
+    },
+    {
+      "kind": "MV",
+      "matcher": "module.public_network",
+      "replacement": "network"
+    }
+  ]
+}

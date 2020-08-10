@@ -1,11 +1,26 @@
 use crate::element::Element;
 use anyhow::Result;
+use std::fmt;
 use std::fs;
 use std::io::{self, Read};
 
 #[derive(PartialEq, Debug)]
 pub struct State {
     pub elements: Vec<Element>,
+}
+
+impl fmt::Display for State {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let str = self
+            .elements
+            .iter()
+            .map(|c| c.to_string())
+            .filter(|s| s != "")
+            .collect::<Vec<String>>()
+            .join("\n");
+
+        write!(f, "{}", format!("{}", str))
+    }
 }
 
 impl State {

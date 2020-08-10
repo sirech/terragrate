@@ -23,6 +23,19 @@ pub struct Commands {
     pub elements: Vec<Command>,
 }
 
+impl fmt::Display for Commands {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let str = self
+            .elements
+            .iter()
+            .map(|c| c.to_string())
+            .collect::<Vec<String>>()
+            .join("\n");
+
+        write!(f, "{}", format!("{}", str))
+    }
+}
+
 impl Commands {
     pub fn new(elements: Vec<Command>) -> Self {
         Self {
