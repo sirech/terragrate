@@ -1,5 +1,3 @@
-pub mod config;
-
 pub mod command;
 mod element;
 pub mod migration;

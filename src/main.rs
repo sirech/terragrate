@@ -4,7 +4,6 @@ extern crate clap;
 use anyhow::Result;
 
 use terragrate::command::Commands;
-use terragrate::config;
 use terragrate::migration::Migration;
 use terragrate::state::State;
 
@@ -35,11 +34,10 @@ fn print_commands(result: &Commands) {
 }
 
 fn main() -> Result<()> {
-    let cfg = config::config();
     let matches = clap_app!(terragrate =>
-                            (version: &*cfg.package.version)
-                            (author: &*cfg.package.authors.join(","))
-                            (about: &*cfg.package.description)
+                            (version: crate_version!())
+                            (author: env!("CARGO_PKG_AUTHORS"))
+                            (about: env!("CARGO_PKG_DESCRIPTION"))
                             (@setting ArgRequiredElseHelp)
                             (@setting ColoredHelp)
                             (@arg STATE: -s --state <STATE_FILE> +takes_value "State file to migrate")
