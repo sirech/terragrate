@@ -1,0 +1,77 @@
+name: macos-release
+on:
+  push:
+    tags:
+      - "*"
+
+env:
+  APP: terragrate
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Restore cargo registry cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+      - name: Restore cargo index cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-index-
+      - name: Restore cargo build cache
+        uses: actions/cache@v1
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-build-target-
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
+      - name: build
+        env:
+          RUST_BACKTRACE: "full"
+        run: cargo build --release --locked
+      - name: linter
+        env:
+          RUST_BACKTRACE: "full"
+        run: |
+          cargo fmt -- --check
+          cargo clippy --release -- -D warnings
+      - name: test
+        env:
+          RUST_BACKTRACE: "full"
+        run: cargo test --release --locked
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: binary
+          path: target/release/${{ env.APP }}
+
+  release:
+    runs-on: macos-latest
+    needs: build-test
+    steps:
+      - name: Restore artifact from previous job
+        uses: actions/download-artifact@v1
+        with:
+          name: binary
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: binary/${{ env.APP }}
+          asset_name: ${{ env.APP }}-x86_64-macos
+          tag: ${{ github.ref }}
+          overwrite: true
