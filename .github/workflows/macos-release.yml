@@ -8,7 +8,7 @@ env:
   APP: terragrate
 
 jobs:
-  test:
+  build:
     runs-on: macos-latest
 
     steps:
@@ -61,7 +61,7 @@ jobs:
 
   release:
     runs-on: macos-latest
-    needs: build-test
+    needs: build
     steps:
       - name: Restore artifact from previous job
         uses: actions/download-artifact@v1
