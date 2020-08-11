@@ -45,7 +45,7 @@ impl Transformation {
 
         TransformationResult {
             element: new_element,
-            command: command,
+            command,
         }
     }
 
@@ -60,7 +60,7 @@ impl Transformation {
 
         TransformationResult {
             element: new_element,
-            command: command,
+            command,
         }
     }
 }

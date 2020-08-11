@@ -12,7 +12,7 @@ pub struct State {
 
 impl fmt::Display for State {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", format!("{}", format_list(&self.elements)))
+        write!(f, "{}", format_list(&self.elements))
     }
 }
 

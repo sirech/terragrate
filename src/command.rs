@@ -26,7 +26,7 @@ pub struct Commands {
 
 impl fmt::Display for Commands {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", format!("{}", format_list(&self.elements)))
+        write!(f, "{}", format_list(&self.elements))
     }
 }
 
