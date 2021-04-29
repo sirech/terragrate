@@ -1,0 +1,28 @@
+version: 2
+updates:
+- package-ecosystem: cargo
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: anyhow
+    versions:
+    - 1.0.38
+    - 1.0.39
+  - dependency-name: serde_derive
+    versions:
+    - 1.0.123
+    - 1.0.124
+  - dependency-name: serde
+    versions:
+    - 1.0.123
+    - 1.0.124
+  - dependency-name: serde_json
+    versions:
+    - 1.0.62
+    - 1.0.63
+  - dependency-name: prettydiff
+    versions:
+    - 0.4.0
